@@ -2,37 +2,37 @@ import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import useFetch from "../../hooks/useFetch";
+import API from "../../axiosInstance";
 
 const Datatable = ({ columns }) => {
   const location = useLocation();
   const path = location.pathname.split("/")[1];
+
   const [list, setList] = useState([]);
-  
+
+  console.log("Datatable → Current path:", path);
+
+  const { data, loading, error } = useFetch(`/${path}`);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-const res = await axios.get(`/api/${path}`);
-        setList(res.data);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      }
-    };
-    fetchData();
-  }, [path]);
+    if (data && Array.isArray(data)) {
+      const filtered = data.filter((item) => item && item._id); // ✅ filter valid rows
+      console.log("Datatable → Filtered data with valid _id:", filtered);
+      setList(filtered);
+    } else {
+      console.warn("Datatable → Data is not an array or empty:", data);
+      setList([]);
+    }
+  }, [data]);
 
   const handleDelete = async (roomId, hotelId) => {
-    if (!roomId || !hotelId) {
-      console.error("Missing roomId or hotelId:", { roomId, hotelId });
-      return;
-    }
-
+    console.log(`Datatable → Deleting room: ${roomId} from hotel: ${hotelId}`);
     try {
-      await axios.delete(`/rooms/${roomId}/${hotelId}`);
-      setList((prev) => prev.filter((item) => item._id !== roomId));
-      console.log(`Deleted room ${roomId} from hotel ${hotelId}`);
+      await API.delete(`/rooms/${roomId}/${hotelId}`);
+      setList((prevList) => prevList.filter((item) => item._id !== roomId));
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error("Datatable → Delete failed:", err);
     }
   };
 
@@ -42,17 +42,15 @@ const res = await axios.get(`/api/${path}`);
       headerName: "Action",
       width: 200,
       renderCell: (params) => {
-        const { _id, hotelId } = params.row;
-        console.log("Row data:", params.row);  // Debug log
-
+        console.log("Datatable → Row data:", params.row);
         return (
           <div className="cellAction">
-            <Link to={`/api/${path}/${_id}`} style={{ textDecoration: "none" }}>
+            <Link to="/users/test" style={{ textDecoration: "none" }}>
               <div className="viewButton">View</div>
             </Link>
             <div
               className="deleteButton"
-              onClick={() => handleDelete(_id, hotelId)}
+              onClick={() => handleDelete(params.row._id, params.row.hotelId)}
             >
               Delete
             </div>
@@ -77,7 +75,8 @@ const res = await axios.get(`/api/${path}`);
         pageSize={9}
         rowsPerPageOptions={[9]}
         checkboxSelection
-        getRowId={(row) => row._id}
+        getRowId={(row) => row._id} // ✅ tells MUI to use _id as unique id
+        loading={loading}
       />
     </div>
   );

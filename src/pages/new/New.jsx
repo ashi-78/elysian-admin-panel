@@ -4,7 +4,7 @@ import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Added
-import axios from "axios";
+import API from "../../axiosInstance"; // Make sure it's your configured instance
 
 const New = ({ inputs, title }) => {
   const [file, setFile] = useState("");
@@ -21,7 +21,7 @@ const New = ({ inputs, title }) => {
     data.append("file", file);
     data.append("upload_preset", "upload");
     try {
-      const uploadRes = await axios.post(
+      const uploadRes = await API.post(
         "https://api.cloudinary.com/v1_1/ashikashyap/image/upload",
         data
       );
@@ -33,7 +33,7 @@ const New = ({ inputs, title }) => {
         img: url,
       };
 
-      await axios.post("/auth/register", newUser);
+      await API.post("/auth/register", newUser);
 
       // ✅ Redirect after success
       navigate("/users");

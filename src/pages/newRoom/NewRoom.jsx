@@ -4,7 +4,7 @@ import Navbar from "../../components/navbar/Navbar";
 import { useState, useContext } from "react";
 import { roomInputs } from "../../formSource";
 import useFetch from "../../hooks/useFetch";
-import axios from "axios";
+import API from "../../axiosInstance";
 import { AuthContext } from "../../context/AuthContext";
 
 const NewRoom = () => {
@@ -23,7 +23,7 @@ const NewRoom = () => {
     e.preventDefault();
     const roomNumbers = rooms.split(",").map((room) => ({ number: room.trim() }));
     try {
-      await axios.post(
+      await API.post(
         `/rooms/${hotelId}`,
         { ...info, roomNumbers },
         {

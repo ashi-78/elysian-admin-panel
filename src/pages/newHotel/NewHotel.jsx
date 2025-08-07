@@ -1,3 +1,4 @@
+// ✅ Final refactored version of your NewHotel component with API and debug logs
 import "./newHotel.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
@@ -6,7 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { hotelInputs } from "../../formSource";
 import useFetch from "../../hooks/useFetch";
-import axios from "axios";
+import API from "../../axiosInstance";
 
 const NewHotel = () => {
   const navigate = useNavigate();
@@ -36,10 +37,12 @@ const NewHotel = () => {
           const formData = new FormData();
           formData.append("file", file);
           formData.append("upload_preset", "upload");
-          const uploadRes = await axios.post(
+
+          const uploadRes = await API.post(
             "https://api.cloudinary.com/v1_1/ashikashyap/image/upload",
             formData
           );
+
           return uploadRes.data.url;
         })
       );
@@ -50,10 +53,13 @@ const NewHotel = () => {
         photos: photoUrls,
       };
 
-      await axios.post("/hotels", newHotel);
+      console.log("🟡 Creating hotel with:", newHotel);
+
+      await API.post("/hotels", newHotel);
+      console.log("✅ Hotel created successfully");
       navigate("/hotels");
     } catch (err) {
-      console.error("Error creating hotel:", err.response?.data || err.message);
+      console.error("❌ Error creating hotel:", err.response?.data || err.message);
     }
   };
 
