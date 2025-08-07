@@ -59,10 +59,11 @@ const Sidebar = () => {
             <AccountCircleOutlinedIcon className="icon" />
             <span>Profile</span>
           </li>
-          <li>
-            <ExitToAppIcon className="icon" />
-            <span>Logout</span>
-          </li>
+          <li onClick={() => window.location.href = "https://hotel-website-74b8.vercel.app/home"}>
+  <ExitToAppIcon className="icon" />
+  <span>Logout</span>
+</li>
+
         </ul>
       </div>
       <div className="bottom">
